@@ -1,6 +1,6 @@
-# OneDrive File Opener 
+# OneDrive Office Files Opener 
 
-This script allows you to open OneDrive files directly in your browser from the command line, with automatic OAuth2 authentication handling.
+This project allows you to open OneDrive office files (Excel, Word & PowerPoint) directly in their web-based Office 365 applications, with automatic OAuth2 authentication handling.
 
 ## Features
 
