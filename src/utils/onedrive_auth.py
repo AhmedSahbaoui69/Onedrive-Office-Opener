@@ -1,6 +1,6 @@
 import requests, subprocess, shlex
 from urllib.parse import urlparse, parse_qs
-from .shared import show_zenity_info, show_zenity_error, load_env_vars, get_env_file_path, open_in_browser
+from .shared import send_notify_info, show_zenity_error, load_env_vars, get_env_file_path, open_in_browser
 
 class OneDriveAuth:
     """Handles Microsoft OneDrive OAuth2 authentication and token management"""
@@ -54,7 +54,7 @@ class OneDriveAuth:
         """Complete OAuth2 authentication flow"""
         try:
             url = self.get_auth_url()
-            show_zenity_info(f"Please visit this URL to authenticate:\n\n{url}\n\nPaste the redirect URL in the next dialog.")
+            send_notify_info(f"Please visit this URL to authenticate:\n\n{url}\n\nPaste the redirect URL in the next dialog.")
             open_in_browser(self.browser_cmd, url)
             redirect_url = subprocess.run(["zenity","--entry","--text=Paste the full redirect URL here:"],capture_output=True,text=True).stdout.strip()
             if not redirect_url: return None, None
@@ -68,16 +68,16 @@ class OneDriveAuth:
         """Handle 401 Unauthorized error by attempting token refresh or re-authentication"""
         rt = self.env_vars.get("REFRESH_TOKEN")
         if rt:
-            show_zenity_info("Access token expired. Refreshing...")
+            send_notify_info("Access token expired. Refreshing...")
             a, r = self.refresh_access_token(rt)
             if a: return a
-        show_zenity_info("Refresh failed. Re-authenticating...")
+        send_notify_info("Refresh failed. Re-authenticating...")
         a, r = self.authenticate_user(); return a
 
     def get_valid_token(self):
         """Get a valid access token, refreshing or re-authenticating if needed"""
         t = self.env_vars.get("ACCESS_TOKEN")
-        if not t: show_zenity_info("No token found. Authenticating...");
+        if not t: send_notify_info("No token found. Authenticating...");
         t,_ = self.authenticate_user()
         return t
 
@@ -86,4 +86,4 @@ class OneDriveAuth:
         env_file, env_vars = get_env_file_path(), load_env_vars()
         env_vars["ACCESS_TOKEN"], env_vars["REFRESH_TOKEN"] = a, r
         with open(env_file,'w') as f: [f.write(f'{k}="{v}"\n') for k,v in env_vars.items()]
-        show_zenity_info(f"Tokens saved!\n\n<b>Access Token: {a[:10]}...</b>\n<b>Refresh Token: {r[:10]}...</b>")
+        send_notify_info(f"Tokens saved!\n\n<b>Access Token: {a[:10]}...</b>\n<b>Refresh Token: {r[:10]}...</b>")

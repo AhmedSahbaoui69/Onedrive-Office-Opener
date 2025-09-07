@@ -2,15 +2,14 @@ import subprocess
 from pathlib import Path
 
 
-def show_zenity_info(message):
-    """Show info dialog using zenity"""
+def send_notify_info(message):
+    """Show info dialog using notify-send instead of zenity"""
     subprocess.run(
-        ["zenity", "--info", f"--text={message}", "--width=400", "2>/dev/null"], 
-        stderr=subprocess.DEVNULL, 
-        check=False
+      ["notify-send", message],
+      stderr=subprocess.DEVNULL,
+      check=False
     )
     print(message)
-
 
 def show_zenity_error(message):
     """Show error dialog using zenity"""
